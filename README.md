@@ -91,31 +91,16 @@ python iniciar.py
 # Ativar ambiente virtual
 venv\Scripts\activate
 
-# Executar o extrator simples
+# Executar o extrator
 python extrator_simples.py
-```
-
-#### Opção 3: Versão Original (Um PDF)
-```bash
-# Ativar ambiente virtual
-venv\Scripts\activate
-
-# Executar versão original
-python extrator_orcamento.py
 ```
 
 ### Processo de Execução
 
-#### Versão Simples (Recomendada):
 1. **Seleção de PDFs**: Uma janela será aberta para selecionar um ou mais arquivos PDF
 2. **Processamento**: O sistema processa todos os arquivos automaticamente
 3. **Janela de Sucesso**: Uma pequena janela centralizada mostra o resultado
 4. **Inserção**: Os dados são inseridos na planilha Google Sheets
-
-#### Versão Original:
-1. **Seleção de Arquivo**: Uma janela será aberta para selecionar o arquivo PDF
-2. **Extração**: O sistema extrai automaticamente os dados do PDF
-3. **Inserção**: Os dados são inseridos na planilha Google Sheets
 
 ### Exemplo de Uso
 
@@ -149,13 +134,12 @@ Os dados foram inseridos na planilha 'Cobrança Makino Irrigação'.
 ## 📁 Estrutura do Projeto
 
 ```
-├── extrator_simples.py           # Script principal (múltiplos PDFs)
-├── extrator_orcamento.py         # Script original (um PDF)
+├── extrator_simples.py           # Script principal
 ├── iniciar.py                    # Script de inicialização
 ├── iniciar.bat                   # Script de inicialização (Windows)
-├── teste_sistema.py              # Script de testes
 ├── requirements.txt               # Dependências Python
 ├── README.md                     # Documentação
+├── .gitignore                    # Arquivos ignorados pelo Git
 ├── venv/                         # Ambiente virtual Python
 └── planilha-python-472618-f3c9ba25d174.json  # Credenciais Google
 ```
