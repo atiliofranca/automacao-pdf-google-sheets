@@ -238,3 +238,4 @@ settings_local.py
 dev_notes.txt
 TODO.txt
 notes.txt
+*.pdf

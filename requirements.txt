@@ -20,3 +20,6 @@ google-auth-httplib2==0.1.1
 
 # Processamento de JSON
 # json já vem incluído com Python
+
+# Criação de executável portável
+pyinstaller==6.3.0

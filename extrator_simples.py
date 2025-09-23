@@ -95,8 +95,9 @@ class ExtratorSimples:
             
             doc.close()
             
-            # Aplicar regex para extrair os dados
-            dados = self._aplicar_regex(texto_completo)
+            # Detectar tipo de arquivo e aplicar regex apropriado
+            tipo_arquivo = self._detectar_tipo_arquivo(texto_completo)
+            dados = self._aplicar_regex(texto_completo, tipo_arquivo)
             
             if dados:
                 return dados
@@ -106,12 +107,47 @@ class ExtratorSimples:
         except Exception as e:
             return None
     
-    def _aplicar_regex(self, texto):
-        """Aplicar expressões regulares para extrair dados"""
+    def _detectar_tipo_arquivo(self, texto):
+        """Detectar o tipo de arquivo baseado no padrão do texto"""
+        # Padrão 2: Arquivo detalhado (exemplo2.pdf)  
+        # Características: Tem "Fantasia:" logo após "Cliente:"
+        if re.search(r"Cliente:\s*\n\s*Fantasia:", texto, re.IGNORECASE | re.MULTILINE):
+            return "tipo2"
+        
+        # Padrão 1: Arquivo simples (exemplo1.pdf)
+        # Características: Cliente na linha seguinte a "Cliente:", formato de valor simples
+        if re.search(r"Cliente:\s*\n\s*[A-ZÁÊÇÕ\s]+", texto, re.IGNORECASE | re.MULTILINE):
+            return "tipo1"
+        
+        # Padrão padrão (fallback)
+        return "tipo1"
+    
+    def _aplicar_regex(self, texto, tipo_arquivo="tipo1"):
+        """Aplicar expressões regulares para extrair dados baseado no tipo de arquivo"""
         dados = {}
         
-        # Regex para Cliente
-        padrao_cliente = r"Cliente:\s*(.+?)(?:\n|$)"
+        if tipo_arquivo == "tipo1":
+            # Padrão original (exemplo1.pdf)
+            dados = self._extrair_tipo1(texto)
+        elif tipo_arquivo == "tipo2":
+            # Padrão novo (exemplo2.pdf)
+            dados = self._extrair_tipo2(texto)
+        
+        # Verificar se todos os campos obrigatórios foram encontrados
+        campos_obrigatorios = ['CLIENTE', 'NUMERO DO PEDIDO', 'DATA', 'VALOR']
+        campos_encontrados = [campo for campo in campos_obrigatorios if campo in dados]
+        
+        if len(campos_encontrados) < len(campos_obrigatorios):
+            return None
+        
+        return dados
+    
+    def _extrair_tipo1(self, texto):
+        """Extrair dados do padrão tipo1 (exemplo1.pdf)"""
+        dados = {}
+        
+        # Regex para Cliente (linha seguinte)
+        padrao_cliente = r"Cliente:\s*\n\s*([A-ZÁÊÇÕ\s]+)"
         match_cliente = re.search(padrao_cliente, texto, re.IGNORECASE | re.MULTILINE)
         if match_cliente:
             dados['CLIENTE'] = match_cliente.group(1).strip()
@@ -128,7 +164,7 @@ class ExtratorSimples:
         if match_data:
             dados['DATA'] = match_data.group(1)
         
-        # Regex para Valor
+        # Regex para Valor (padrão simples)
         padrao_valor = r"TOTAL:\s*\n.*?Vendedor:.*?\n.*?\n\s*([\d.,]+)"
         match_valor = re.search(padrao_valor, texto, re.IGNORECASE | re.MULTILINE | re.DOTALL)
         
@@ -141,12 +177,76 @@ class ExtratorSimples:
             except ValueError:
                 dados['VALOR'] = valor_str
         
-        # Verificar se todos os campos obrigatórios foram encontrados
-        campos_obrigatorios = ['CLIENTE', 'NUMERO DO PEDIDO', 'DATA', 'VALOR']
-        campos_encontrados = [campo for campo in campos_obrigatorios if campo in dados]
+        # Regex para RETIRADO POR (campo Mensagem) - pode ter vendedor na linha seguinte
+        # Inclui caracteres especiais para nomes compostos (&, números, etc.)
+        padrao_retirado_por = r"Mensagem:\s*\n(?:\s*[^\n]*\n)?\s*([A-ZÁÊÇÕ\s&0-9]+?)(?:\n|$)"
+        match_retirado_por = re.search(padrao_retirado_por, texto, re.IGNORECASE | re.MULTILINE)
+        if match_retirado_por:
+            retirado_por = match_retirado_por.group(1).strip()
+            # Verificar se não é uma data ou valor e se tem pelo menos 2 caracteres
+            if (not re.match(r'^\d+[/-]\d+[/-]\d+$', retirado_por) and 
+                not re.match(r'^[\d.,]+$', retirado_por) and 
+                len(retirado_por) >= 2):
+                dados['RETIRADO POR'] = retirado_por
         
-        if len(campos_encontrados) < len(campos_obrigatorios):
-            return None
+        return dados
+    
+    def _extrair_tipo2(self, texto):
+        """Extrair dados do padrão tipo2 (exemplo2.pdf)"""
+        dados = {}
+        
+        # Regex para Cliente (está algumas linhas depois de "Cliente:")
+        # Procurar por linhas que contenham apenas nome em maiúsculas
+        linhas = texto.split('\n')
+        cliente_encontrado = False
+        for i, linha in enumerate(linhas):
+            if 'Cliente:' in linha and not cliente_encontrado:
+                # Procurar nas próximas linhas por um nome em maiúsculas
+                for j in range(i+1, min(i+15, len(linhas))):
+                    linha_atual = linhas[j].strip()
+                    # Verificar se é um nome (apenas letras, espaços e caracteres especiais)
+                    if linha_atual and re.match(r'^[A-ZÁÊÇÕ\s\.]+$', linha_atual) and len(linha_atual) > 5:
+                        dados['CLIENTE'] = linha_atual
+                        cliente_encontrado = True
+                        break
+        
+        # Regex para Número do Pedido
+        padrao_pedido = r"PEDIDO\s*N[°ºo]\s*(\d+)"
+        match_pedido = re.search(padrao_pedido, texto, re.IGNORECASE)
+        if match_pedido:
+            dados['NUMERO DO PEDIDO'] = match_pedido.group(1)
+        
+        # Regex para Data
+        padrao_data = r"Data\s*Emiss[ãa]o:\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})"
+        match_data = re.search(padrao_data, texto, re.IGNORECASE)
+        if match_data:
+            dados['DATA'] = match_data.group(1)
+        
+        # Regex para Valor (padrão com milhares)
+        padrao_valor = r"TOTAL:\s*\n\s*VALOR BRUTO:\s*\n\s*([\d.,]+)"
+        match_valor = re.search(padrao_valor, texto, re.IGNORECASE | re.MULTILINE)
+        
+        if match_valor:
+            valor_str = match_valor.group(1).strip()
+            # Tratar formato brasileiro (1.234,56)
+            valor_limpo = valor_str.replace('.', '').replace(',', '.')
+            try:
+                valor_float = float(valor_limpo)
+                dados['VALOR'] = f"{valor_float:.2f}"
+            except ValueError:
+                dados['VALOR'] = valor_str
+        
+        # Regex para RETIRADO POR (campo Mensagem) - pode ter vendedor na linha seguinte
+        # Inclui caracteres especiais para nomes compostos (&, números, etc.)
+        padrao_retirado_por = r"Mensagem:\s*\n(?:\s*[^\n]*\n)?\s*([A-ZÁÊÇÕ\s&0-9]+?)(?:\n|$)"
+        match_retirado_por = re.search(padrao_retirado_por, texto, re.IGNORECASE | re.MULTILINE)
+        if match_retirado_por:
+            retirado_por = match_retirado_por.group(1).strip()
+            # Verificar se não é uma data ou valor e se tem pelo menos 2 caracteres
+            if (not re.match(r'^\d+[/-]\d+[/-]\d+$', retirado_por) and 
+                not re.match(r'^[\d.,]+$', retirado_por) and 
+                len(retirado_por) >= 2):
+                dados['RETIRADO POR'] = retirado_por
         
         return dados
     
@@ -174,12 +274,24 @@ class ExtratorSimples:
             # Preparar dados para inserção
             linhas_dados = []
             for dados in dados_list:
+                # Formatar valor como moeda brasileira (R$)
+                valor_formatado = dados.get('VALOR', '')
+                if valor_formatado:
+                    try:
+                        # Converter para float e depois formatar como moeda brasileira
+                        valor_float = float(valor_formatado)
+                        # Formatar como R$ 1.234,56
+                        valor_formatado = f"R$ {valor_float:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                    except (ValueError, TypeError):
+                        # Se não conseguir converter, manter o valor original
+                        pass
+                
                 linha_dados = [
                     dados.get('CLIENTE', ''),
                     dados.get('NUMERO DO PEDIDO', ''),
                     dados.get('DATA', ''),
-                    dados.get('VALOR', ''),
-                    ''  # RETIRADO POR - deixado em branco
+                    valor_formatado,
+                    dados.get('RETIRADO POR', '')  # RETIRADO POR - extraído do campo Mensagem
                 ]
                 linhas_dados.append(linha_dados)
             
