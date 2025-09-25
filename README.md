@@ -4,10 +4,10 @@ Sistema automatizado para extração de dados de PDFs de orçamento e inserção
 
 ## ✨ Funcionalidades Principais
 
-- 🔍 **Detecção Automática de Tipos**: Identifica automaticamente diferentes formatos de PDF
+- 🔍 **Detecção Automática de Tipos**: Identifica automaticamente diferentes formatos de PDF - Canhoto e folha A4
 - 📄 **Seleção Múltipla**: Processa vários arquivos PDF simultaneamente
 - 🎨 **Interface Gráfica**: Janelas centralizadas e amigáveis
-- 💰 **Formatação de Moeda**: Valores em formato brasileiro (R$ 1.500,00)
+- 💰 **Formatação de Moeda**: Valores em formato brasileiro
 - 📊 **Integração Google Sheets**: Inserção automática na planilha
 - ✅ **Feedback Visual**: Mensagens de sucesso/erro personalizadas
 
@@ -21,17 +21,19 @@ O sistema extrai automaticamente os seguintes dados dos PDFs:
 | **NUMERO DO PEDIDO** | Número do pedido | Campo "PEDIDO N°"                    |
 | **DATA**             | Data de emissão  | Campo "Data Emissão:"                |
 | **VALOR**            | Valor total       | Campo "TOTAL:" (formato: R$ 1.500,00) |
-| **RETIRADO POR**     | Deixado em branco | -                                     |
+| **RETIRADO POR**     | Retirado por:    | Campo "Mensagem"                      |
 
 ## 🎯 Tipos de PDF Suportados
 
 ### Tipo 1: Formato Simples (exemplo1.pdf)
 
+- Canhoto impresso no momento da emissão do pedido
 - Cliente na linha seguinte a "Cliente:"
 - Formato de valor simples após "TOTAL:"
 
 ### Tipo 2: Formato Detalhado (exemplo2.pdf)
 
+- Folha A4 impressa no momento de pesquisa do pedido
 - Campo "Fantasia:" após "Cliente:"
 - Valor após "VALOR BRUTO:" dentro de "TOTAL:"
 

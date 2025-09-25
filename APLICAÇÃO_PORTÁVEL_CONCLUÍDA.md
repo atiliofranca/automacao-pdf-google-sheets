@@ -63,8 +63,3 @@ dist/Extrator_Orcamentos_Makino/
 - **Dependências:** Todas incluídas
 - **Interface:** Gráfica (tkinter)
 - **Compatibilidade:** Windows 10/11
-
----
-
-**🎯 MISSÃO CUMPRIDA!**  
-A aplicação portável está pronta para distribuição e uso em qualquer computador Windows sem necessidade de instalar Python ou dependências!
