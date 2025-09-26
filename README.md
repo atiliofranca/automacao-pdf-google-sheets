@@ -226,4 +226,4 @@ Para problemas ou dúvidas:
 
 ---
 
-**Desenvolvido para Makino Irrigação** 🌱
+**Desenvolvido para Makino Agrícola e Irrigação** 🌱
