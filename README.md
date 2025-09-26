@@ -15,13 +15,13 @@ Sistema automatizado para extração de dados de PDFs de orçamento e inserção
 
 O sistema extrai automaticamente os seguintes dados dos PDFs:
 
-| Campo                      | Descrição       | Localização no PDF                  |
+| Campo                      | Descrição         | Localização no PDF                    |
 | -------------------------- | ----------------- | ------------------------------------- |
-| **CLIENTE**          | Nome do cliente   | Campo "Cliente:"                      |
-| **NUMERO DO PEDIDO** | Número do pedido | Campo "PEDIDO N°"                    |
-| **DATA**             | Data de emissão  | Campo "Data Emissão:"                |
-| **VALOR**            | Valor total       | Campo "TOTAL:" (formato: R$ 1.500,00) |
-| **RETIRADO POR**     | Retirado por:    | Campo "Mensagem"                      |
+| **CLIENTE**                | Nome do cliente   | Campo "Cliente:"                      |
+| **NUMERO DO PEDIDO**       | Número do pedido  | Campo "PEDIDO N°"                     |
+| **DATA**                   | Data de emissão   | Campo "Data Emissão:"                 |
+| **VALOR**                  | Valor total       | Campo "TOTAL:" (formato: R$ 1.500,00) |
+| **RETIRADO POR**           | Retirado por:     | Campo "Mensagem"                      |
 
 ## 🎯 Tipos de PDF Suportados
 
@@ -90,17 +90,17 @@ O arquivo `planilha-python-472618-f3c9ba25d174.json` contém as credenciais da c
 ## 📁 Estrutura do Projeto
 
 ```
-├── extrator_simples.py                    # Script principal
-├── extrator_simples.spec                 # Configuração PyInstaller
-├── gerar_executavel.bat                  # Script para gerar executável
-├── requirements.txt                      # Dependências Python
-├── README.md                            # Documentação principal
-├── INSTRUÇÕES_EXECUTÁVEL.md             # Guia para gerar executável
-├── ícone.ico                           # Ícone da aplicação
-├── exemplo1.pdf                        # PDF tipo 1 (formato simples)
-├── exemplo2.pdf                        # PDF tipo 2 (formato detalhado)
-├── planilha-python-472618-f3c9ba25d174.json  # Credenciais Google
-└── venv/                               # Ambiente virtual Python
+├── extrator_simples.py                        # Script principal
+├── extrator_simples.spec                      # Configuração PyInstaller
+├── gerar_executavel.bat                       # Script para gerar executável
+├── requirements.txt                           # Dependências Python
+├── README.md                                  # Documentação principal
+├── INSTRUÇÕES_EXECUTÁVEL.md                   # Guia para gerar executável
+├── ícone.ico                                  # Ícone da aplicação
+├── exemplo1.pdf                               # PDF tipo 1 (formato simples)
+├── exemplo2.pdf                               # PDF tipo 2 (formato detalhado)
+├── planilha-python-472618-f3c9ba25d174.json   # Credenciais Google
+└── venv/                                      # Ambiente virtual Python
 ```
 
 ## 🔧 Configuração da Planilha Google Sheets
